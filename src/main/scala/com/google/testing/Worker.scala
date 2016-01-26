@@ -14,6 +14,8 @@ object Worker {
 
   val logger = LoggerFactory.getLogger(getClass)
 
+
+
   def work(t: TestState): Future[TestState] = Future {
     logger.info("Running command")
 
