@@ -1,0 +1,14 @@
+.id-width {
+    display: inline-block;
+    width: 20px;
+}
+
+.url-width {
+    display: inline-block;
+    width: 300px;
+}
+
+.jumbotron {
+	color: white;
+	background-color: #2196F3;
+}
