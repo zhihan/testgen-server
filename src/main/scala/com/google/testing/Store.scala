@@ -30,7 +30,8 @@ case class TestState(val ID: Int,
   val dir: String,
   val log: String,
   val result: Option[Result]) {
-  def toTest:Test = Test(ID, classname, timelimit, state, log, result.isEmpty)
+  def toTest:Test = Test(
+    ID, classname, timelimit, state, log, result.isEmpty)
 }
 
 
@@ -40,6 +41,7 @@ object TestState {
 }
 
 
+/** In-memory store of all the tests. */
 object Store {
 
   val logger = LoggerFactory.getLogger(getClass)
@@ -63,5 +65,7 @@ object Store {
     testStates.find{
       case(id, y) => y.state == "READY"
     }.flatMap{ case (id, y) => Some(y) }
+
+  def clear { testStates.clear }
 
 }
