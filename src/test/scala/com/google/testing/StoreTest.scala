@@ -20,4 +20,9 @@ class StoreTest extends FunSuite with BeforeAndAfter {
     val l = Store.getTests
     assert(l == List(ts.toTest))
   }
+
+  test("Next ready") {
+    val x = Store.nextReady
+    assert(x == Some(ts))
+  }
 }
