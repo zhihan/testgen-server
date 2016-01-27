@@ -17,26 +17,30 @@ testApp.controller(
 	 }
 	 
 	 $scope.addTest = function() {
-        if ($scope.url) {
-		 var url = $scope.url;
-		 var id = $scope.newID();
-
-		 var newTest = {"ID": id,
-				"url": url,
-				"state": "READY"};
-		 $scope.tests.push(newTest);
-		 $scope.url = "";
-
-		 var newTestResource = new TestResource(newTest);
-		 newTestResource.$save();
-        }
+             if ($scope.classname && $scope.timelimit) {
+	         var classname = $scope.classname;
+	         var id = $scope.newID();
+                 var timelimit = $scope.timelimit
+                 
+	         var newTest = {"ID": id,
+			        "classname": classname,
+                                "timelimit": timelimit,
+			        "state": "READY",
+                               };
+                 $scope.tests.push(newTest);
+                 $scope.classname = "";
+                 $scope.timelimit = "";
+                 
+                 var newTestResource = new TestResource(newTest);
+                 newTestResource.$save();
+             }
 	 }
-
-
+         
+         
 	 $scope.loadData = function() {
 	     TestResource.query(function(tests) {
 		 $scope.tests = tests;
-
+                 
                  function getMaxOfArray(numArray) {
                      return Math.max.apply(null, numArray);
                  }

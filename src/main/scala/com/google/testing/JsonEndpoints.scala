@@ -29,12 +29,12 @@ class JsonEndpoints extends ScalatraServlet with JacksonJsonSupport {
 
   get("/test/:id") {
     logger.info("Gettting a test for id {}", params("id"))
-    Test(params("id").toInt, "source", "pass")
+    Test(0, "", 0, "", "", false)
   }
 
   post("/test/:id") {
     logger.info("Saving a test for id {}: {}", params("id"))
-    Store.addTest(parsedBody.extract[Test])
+    Store.addTest(parsedBody.extract[NewTest])
     Worker.run
   }
 

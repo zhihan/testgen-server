@@ -4,21 +4,39 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.mutable.Map 
 
-case class Test(val ID: Int, val url: String, val state: String)
+/** A newly created test */
+case class NewTest(val ID: Int,
+  val classname: String,
+  val timelimit: Int,
+  val state: String)
 
-case class TestState(val ID: Int,
-  val url: String,
-  val dir: String,
+/** A Test class that is exposed to the REST endpoints. */
+case class Test(val ID: Int,
+  val classname: String,
+  val timelimit: Int,
   val state: String,
-  val log: String) {
+  val log: String,
+  val hasResult: Boolean)
 
 
-  def toTest:Test = Test(ID, url, state)
+case class Result(val errorTestJar: String, // Path to the zip files
+  val regressionTestJar: String) 
+
+/** An internal representation of the test */
+case class TestState(val ID: Int,
+  val classname: String,
+  val timelimit: Int,
+  val state: String,
+  val dir: String,
+  val log: String,
+  val result: Option[Result]) {
+  def toTest:Test = Test(ID, classname, timelimit, state, log, result.isEmpty)
 }
 
+
 object TestState {
-  def fromTest(t: Test): TestState = new TestState(t.ID,
-    t.url, "", t.state, "")
+  def fromNewTest(t: NewTest): TestState = new TestState(t.ID,
+    t.classname, t.timelimit, t.state, "", "", None)
 }
 
 
@@ -30,8 +48,9 @@ object Store {
 
   def getTests: List[Test] = testStates.values.toList.map{ _.toTest }
 
-  def addTest(t: Test) {
-    testStates += (t.ID -> TestState.fromTest(t))
+  def addTest(t: NewTest) {
+    logger.info("Try to add {}", t)
+    testStates += (t.ID -> TestState.fromNewTest(t))
     logger.info("{} added to store", t)
   }
 

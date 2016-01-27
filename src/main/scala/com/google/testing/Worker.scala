@@ -34,7 +34,7 @@ object Worker {
 
   def workOn(t: TestState) {
     logger.info("Work on {}", t)
-    val newT = t.copy(state="WORKING")
+    val newT: TestState = t.copy(state="WORKING")
     Store.updateTest(newT)
 
     val result = work(newT)
