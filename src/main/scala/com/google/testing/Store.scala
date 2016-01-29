@@ -19,8 +19,8 @@ case class Test(val ID: Int,
   val hasResult: Boolean)
 
 
-case class Result(val errorTestJar: String, // Path to the zip files
-  val regressionTestJar: String) 
+case class Result(val errorTest: Option[String], // Path to the zip files
+  val regressionTest: Option[String]) 
 
 /** An internal representation of the test */
 case class TestState(val ID: Int,
