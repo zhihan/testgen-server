@@ -19,6 +19,7 @@ object Worker {
 
   val logger = LoggerFactory.getLogger(getClass)
 
+  /** Create a zip file that contains all files in the glob pattern. */
   def createZipFile(dir: Path, glob: String,
     zipname:String): Option[Path] = {
     val srcFiles = Files.newDirectoryStream(dir, glob).toList
@@ -60,6 +61,10 @@ object Worker {
     t.copy(log=log, result=Some(Result(err, reg)))
   }
 
+
+  def copyResults(t: TestState, dir:Path): TestState = {
+     
+  }
 
   def work(t: TestState): Future[TestState] = Future {
     logger.info("Running command")

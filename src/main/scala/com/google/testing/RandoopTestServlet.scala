@@ -46,12 +46,14 @@ class RandoopTestServlet extends ScalatraServlet {
         <div ng-model="tests" class="panel">
           <ul class="list-group">
             <li class="list-group-item" ng-repeat="test in tests | orderBy:'+ID' track by test.ID">
-            <span class="id-width">{{ test.ID }}</span> <span class="url-width">{{ test.classname }}</span> 
+            <span class="id-width">{{ test.ID }}</span> <span>{{ test.classname }}</span> 
             <span ng-switch="test.state">
               <span class="text-primary" ng-switch-when="WORKING"><strong>{{ test.state }}</strong></span>
               <span class="text-success" ng-switch-when="COMPLETED"><strong>{{ test.state }}</strong></span>
               <span ng-switch-default><strong>{{ test.state }}</strong></span>
             </span>
+            <button type="button" class="btn btn-default btn-sm" 
+            ng-if="test.log" ng-click="showLog(test.log)">LOG</button>
            </li>
           </ul>
         </div>
