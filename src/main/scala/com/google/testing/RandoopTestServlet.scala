@@ -1,7 +1,8 @@
 package com.google.testing
 
-import org.slf4j.{Logger, LoggerFactory}
+import java.io.File
 
+import org.slf4j.{Logger, LoggerFactory}
 import org.scalatra.ScalatraServlet
 
 class RandoopTestServlet extends ScalatraServlet {
@@ -63,6 +64,14 @@ class RandoopTestServlet extends ScalatraServlet {
 
       </body>
     </html>"""
+  }
+
+  get("/file") {
+    contentType = "application/octet-stream"
+    val theFile = new File("/Users/zhihan/test.txt")
+    response.setHeader("Content-Disposition",
+      "attachment; filename=" + theFile.getName())
+    theFile
   }
 
 }

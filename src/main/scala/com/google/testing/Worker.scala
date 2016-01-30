@@ -62,8 +62,31 @@ object Worker {
   }
 
 
-  def copyResults(t: TestState, dir:Path): TestState = {
-     
+  def copyOneFile(result: Option[String], dstDir:Path): Option[String] = {
+    result.flatMap {
+      case src => {
+        val srcFile = Paths.get(src)
+        val dstFile = dstDir.resolve(srcFile.getFileName())
+        Files.copy(srcFile, dstFile, StandardCopyOption.REPLACE_EXISTING)
+        Some(dstFile.toString())
+      }
+    }
+  }
+
+  def copyResults(t: TestState): TestState = {
+    // TODO(zhihan): Add real function here.
+    val resultsRoot = Paths.get(Constants.resultsDir)
+    val resultsDir = Files.createDirectory(resultsRoot.resolve(t.ID.toString))
+
+    val result = t.result match {
+      case Some(r) => {
+        val errTest = copyOneFile(r.errorTest, resultsDir)
+        val regTest = copyOneFile(r.regressionTest, resultsDir)
+        Some(Result(errTest, regTest))
+      }
+      case None => None
+    }
+    t.copy(result=result)
   }
 
   def work(t: TestState): Future[TestState] = Future {
@@ -80,7 +103,8 @@ object Worker {
     val t2 = executeTest(t1, workingDir)
 
     // Collecting results
-    t2.copy(state="COMPLETED")
+    val t3 = copyResults(t2)
+    t3.copy(state="COMPLETED")
   }
   
 

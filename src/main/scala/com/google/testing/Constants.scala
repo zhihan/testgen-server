@@ -12,10 +12,13 @@ object Constants {
 
   lazy val config = parse(new File(configFile))
 
-  lazy val randoopJar:String = {
+  lazy val randoopJar: String = {
     val tools_dir = (config \ "tools_dir").extract[String]
     val filename = (config \ "randoop_jar").extract[String]
     tools_dir + "/" + filename
   }
+
+  lazy val resultsDir: String =
+    (config \ "results_dir").extract[String]
 
 }
