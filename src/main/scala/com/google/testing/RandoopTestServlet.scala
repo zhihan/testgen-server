@@ -67,14 +67,6 @@ class RandoopTestServlet extends ScalatraServlet {
     </html>"""
   }
 
-  get("/results/:id/error-test") {
-    contentType = "application/octet-stream"
-    val theFile = new File("/Users/zhihan/test.txt")
-    response.setHeader("Content-Disposition",
-      "attachment; filename=" + theFile.getName())
-    theFile
-  }
-
   get("/results/:id/regression-test") {
     val regressionTestFile = Store.getRegressionTest(params("id").toInt)
     if (!regressionTestFile.isEmpty) {
