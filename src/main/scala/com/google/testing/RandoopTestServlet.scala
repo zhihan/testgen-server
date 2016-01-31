@@ -4,6 +4,7 @@ import java.io.File
 
 import org.slf4j.{Logger, LoggerFactory}
 import org.scalatra.ScalatraServlet
+import org.scalatra.NotFound
 
 class RandoopTestServlet extends ScalatraServlet {
   val logger = LoggerFactory.getLogger(getClass)
@@ -66,12 +67,41 @@ class RandoopTestServlet extends ScalatraServlet {
     </html>"""
   }
 
-  get("/file") {
+  get("/results/:id/error-test") {
     contentType = "application/octet-stream"
     val theFile = new File("/Users/zhihan/test.txt")
     response.setHeader("Content-Disposition",
       "attachment; filename=" + theFile.getName())
     theFile
   }
+
+  get("/results/:id/regression-test") {
+    val regressionTestFile = Store.getRegressionTest(params("id").toInt)
+    if (!regressionTestFile.isEmpty) {
+      contentType = "application/octet-stream"
+      val theFile = new File(regressionTestFile.get)
+      response.setHeader("Content-Disposition",
+        "attachment; filename=" + theFile.getName())
+      theFile
+    } else {
+      contentType = null
+      NotFound("Result file not found.")
+    }
+  }
+
+  get("/results/:id/error-test") {
+    val errorTestFile = Store.getErrorTest(params("id").toInt)
+    if (!errorTestFile.isEmpty) {
+      contentType = "application/octet-stream"
+      val theFile = new File(errorTestFile.get)
+      response.setHeader("Content-Disposition",
+        "attachment; filename=" + theFile.getName())
+      theFile
+    } else {
+      contentType = null
+      NotFound("Result file not found.")
+    }
+  }
+  
 
 }

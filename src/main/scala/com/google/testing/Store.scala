@@ -68,4 +68,15 @@ object Store {
 
   def clear { testStates.clear }
 
+  def getErrorTest(id: Int): Option[String] = 
+    for (ts <- testStates.get(id);
+      r <- ts.result;
+      e <- r.errorTest) yield e
+
+  def getRegressionTest(id: Int): Option[String] = 
+    for (ts <- testStates.get(id);
+      r <- ts.result;
+      reg <- r.regressionTest) yield reg
+  
+
 }

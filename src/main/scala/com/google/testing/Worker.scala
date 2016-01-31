@@ -74,9 +74,11 @@ object Worker {
   }
 
   def copyResults(t: TestState): TestState = {
-    // TODO(zhihan): Add real function here.
     val resultsRoot = Paths.get(Constants.resultsDir)
-    val resultsDir = Files.createDirectory(resultsRoot.resolve(t.ID.toString))
+    val resultsDir = resultsRoot.resolve(t.ID.toString)
+    if (!Files.exists(resultsDir)) {
+      Files.createDirectory(resultsDir)
+    }
 
     val result = t.result match {
       case Some(r) => {
@@ -99,11 +101,15 @@ object Worker {
     logger.info("Created working directory {}", workingDir.toString())
     val t1 = t.copy(dir=workingDir.toString())
 
+    logger.info("Executing test")
     // Execute test
     val t2 = executeTest(t1, workingDir)
 
     // Collecting results
+    logger.info("Copying test results")
     val t3 = copyResults(t2)
+
+    logger.info("Test {} completed", t.ID)
     t3.copy(state="COMPLETED")
   }
   
