@@ -14,7 +14,7 @@ class RandoopTestServlet extends ScalatraServlet {
 
     """<html ng-app="testApp">
       <head>
-      <title>Randoop Test Service</title>
+      <title>Java Test Service</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
       
       <link rel="stylesheet" href="css/bootstrap.css"></link>
@@ -28,7 +28,7 @@ class RandoopTestServlet extends ScalatraServlet {
         <div class="container-fluid">
         <div class="jumbotron bg-primary">
         <h1>Java Test Generation Service</h1>
-        <p>Use Randoop to generate test code for a built-in java class.</p>
+        <p>Use Randoop to generate test code for a given java class.</p>
         </div>
         <div ng-controller="mainController">
         <form class="form-inline">
@@ -48,14 +48,16 @@ class RandoopTestServlet extends ScalatraServlet {
         <div ng-model="tests" class="panel">
           <ul class="list-group">
             <li class="list-group-item" ng-repeat="test in tests | orderBy:'+ID' track by test.ID">
-            <span class="id-width">{{ test.ID }}</span> <span>{{ test.classname }}</span> 
+            <span class="id-width">{{ test.ID }}</span> <span><code>{{ test.classname }}</code></span> 
             <span ng-switch="test.state">
               <span class="text-primary" ng-switch-when="WORKING"><strong>{{ test.state }}</strong></span>
               <span class="text-success" ng-switch-when="COMPLETED"><strong>{{ test.state }}</strong></span>
               <span ng-switch-default><strong>{{ test.state }}</strong></span>
             </span>
-            <button type="button" class="btn btn-default btn-sm" 
+            <button type="button" class="btn btn-info btn-sm" 
             ng-if="test.log" ng-click="showLog(test.log)">LOG</button>
+            <button type="button" class="btn btn-success btn-sm"
+            ng-if="test.hasResult" ng-click="downloadResult(test.ID)">RESULT</button>
            </li>
           </ul>
         </div>
@@ -67,11 +69,11 @@ class RandoopTestServlet extends ScalatraServlet {
     </html>"""
   }
 
-  get("/results/:id/regression-test") {
-    val regressionTestFile = Store.getRegressionTest(params("id").toInt)
-    if (!regressionTestFile.isEmpty) {
+  get("/results/:id") {
+    val resultFile = Store.getResult(params("id").toInt)
+    if (!resultFile.isEmpty) {
       contentType = "application/octet-stream"
-      val theFile = new File(regressionTestFile.get)
+      val theFile = new File(resultFile.get)
       response.setHeader("Content-Disposition",
         "attachment; filename=" + theFile.getName())
       theFile
@@ -80,20 +82,5 @@ class RandoopTestServlet extends ScalatraServlet {
       NotFound("Result file not found.")
     }
   }
-
-  get("/results/:id/error-test") {
-    val errorTestFile = Store.getErrorTest(params("id").toInt)
-    if (!errorTestFile.isEmpty) {
-      contentType = "application/octet-stream"
-      val theFile = new File(errorTestFile.get)
-      response.setHeader("Content-Disposition",
-        "attachment; filename=" + theFile.getName())
-      theFile
-    } else {
-      contentType = null
-      NotFound("Result file not found.")
-    }
-  }
-  
 
 }

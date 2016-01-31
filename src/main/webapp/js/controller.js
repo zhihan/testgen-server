@@ -43,6 +43,10 @@ testApp.controller(
             w.document.close();
         };
 
+        $scope.downloadResult = function(ID) {
+            window.location="/results/"+ID;
+        };
+
         $scope.loadData = function() {
             TestResource.query(function(tests) {
                 $scope.tests = tests;

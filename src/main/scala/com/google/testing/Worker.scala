@@ -49,28 +49,20 @@ object Worker {
       "--junit-output-dir=" + t.dir)
     val log = cmd.!!
 
-    // Create zip files for Error tests
-    val errorTest = createZipFile(dir,
-      "ErrorTest*.java", "error_test.zip")
-    val err = errorTest flatMap { case x => Some(x.toString) }
+    // Create zip files for tests
+    val result = createZipFile(dir,
+      "*.java", "test.zip")
+    val resultField = for (r <- result) yield r.toString
 
-    val regTest = createZipFile(dir,
-      "RegressionTest*.java", "regression_test.zip")
-    val reg = regTest flatMap { case x => Some(x.toString) }
-
-    t.copy(log=log, result=Some(Result(err, reg)))
+    t.copy(log=log, result=resultField)
   }
 
 
-  def copyOneFile(result: Option[String], dstDir:Path): Option[String] = {
-    result.flatMap {
-      case src => {
-        val srcFile = Paths.get(src)
-        val dstFile = dstDir.resolve(srcFile.getFileName())
-        Files.copy(srcFile, dstFile, StandardCopyOption.REPLACE_EXISTING)
-        Some(dstFile.toString())
-      }
-    }
+  def copyOneFile(src: String, dstDir:Path): String = {
+    val srcFile = Paths.get(src)
+    val dstFile = dstDir.resolve(srcFile.getFileName())
+    Files.copy(srcFile, dstFile, StandardCopyOption.REPLACE_EXISTING)
+    dstFile.toString() 
   }
 
   def copyResults(t: TestState): TestState = {
@@ -80,14 +72,8 @@ object Worker {
       Files.createDirectory(resultsDir)
     }
 
-    val result = t.result match {
-      case Some(r) => {
-        val errTest = copyOneFile(r.errorTest, resultsDir)
-        val regTest = copyOneFile(r.regressionTest, resultsDir)
-        Some(Result(errTest, regTest))
-      }
-      case None => None
-    }
+    val result = for (tmpResult <- t.result) 
+      yield copyOneFile(tmpResult, resultsDir)
     t.copy(result=result)
   }
 

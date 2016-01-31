@@ -18,10 +18,6 @@ case class Test(val ID: Int,
   val log: String,
   val hasResult: Boolean)
 
-
-case class Result(val errorTest: Option[String], // Path to the zip files
-  val regressionTest: Option[String]) 
-
 /** An internal representation of the test */
 case class TestState(val ID: Int,
   val classname: String,
@@ -29,9 +25,9 @@ case class TestState(val ID: Int,
   val state: String,
   val dir: String,
   val log: String,
-  val result: Option[Result]) {
+  val result: Option[String]) {
   def toTest:Test = Test(
-    ID, classname, timelimit, state, log, result.isEmpty)
+    ID, classname, timelimit, state, log, !result.isEmpty)
 }
 
 
@@ -68,15 +64,9 @@ object Store {
 
   def clear { testStates.clear }
 
-  def getErrorTest(id: Int): Option[String] = 
+  def getResult(id: Int): Option[String] = 
     for (ts <- testStates.get(id);
-      r <- ts.result;
-      e <- r.errorTest) yield e
-
-  def getRegressionTest(id: Int): Option[String] = 
-    for (ts <- testStates.get(id);
-      r <- ts.result;
-      reg <- r.regressionTest) yield reg
+      r <- ts.result) yield r
   
 
 }
