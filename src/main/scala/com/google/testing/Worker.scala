@@ -15,15 +15,16 @@ import java.nio.file.Files
 import java.nio.file.FileSystems
 import java.nio.file.StandardCopyOption
 
-object Worker {
 
+class FileUtil {
   val logger = LoggerFactory.getLogger(getClass)
 
   /** Create a zip file that contains all files in the glob pattern. */
-  def createZipFile(dir: Path, glob: String,
-    zipname:String): Option[Path] = {
+  def createZipFile(dir: Path, glob: String, zipname:String): Option[Path] = {
     val srcFiles = Files.newDirectoryStream(dir, glob).toList
     if (!srcFiles.isEmpty) {
+      logger.info("Creating zip file for results")
+
       val env:java.util.Map[String, String] = new java.util.HashMap();
       env.put("create", "true")
       val zipfile:Path = dir.resolve(zipname)
@@ -36,28 +37,12 @@ object Worker {
       zipfs.close()
       Some(zipfile)
     } else {
+      logger.info("No output file found")
       None
     }
   }
 
-  def executeTest(t: TestState, dir:Path): TestState = {
-    val cmd = Seq("java",
-      "-classpath", Constants.randoopJar,
-      "randoop.main.Main", "gentests",
-      "--testclass=" + t.classname,
-      "--timelimit=" + t.timelimit,
-      "--junit-output-dir=" + t.dir)
-    val log = cmd.!!
-
-    // Create zip files for tests
-    val result = createZipFile(dir,
-      "*.java", "test.zip")
-    val resultField = for (r <- result) yield r.toString
-
-    t.copy(log=log, result=resultField)
-  }
-
-
+  /** Copy one file from source to destination */
   def copyOneFile(src: String, dstDir:Path): String = {
     val srcFile = Paths.get(src)
     val dstFile = dstDir.resolve(srcFile.getFileName())
@@ -65,15 +50,50 @@ object Worker {
     dstFile.toString() 
   }
 
-  def copyResults(t: TestState): TestState = {
-    val resultsRoot = Paths.get(Constants.resultsDir)
-    val resultsDir = resultsRoot.resolve(t.ID.toString)
-    if (!Files.exists(resultsDir)) {
+  /** Ensure the directory exists */
+  def ensureExists(resultsDir:Path) {
+   if (!Files.exists(resultsDir)) {
       Files.createDirectory(resultsDir)
     }
+  }
+
+}
+
+
+
+class Worker(fileUtil: FileUtil, constants: Constants) {
+
+  val logger = LoggerFactory.getLogger(getClass)
+
+  val RESULT_FILENAME = "test.zip"
+
+  /** Execute the test generation step */
+  def executeTest(t: TestState, dir:Path): TestState = {
+    val cmd = Seq("java",
+      "-classpath", constants.randoopJar,
+      "randoop.main.Main", "gentests",
+      "--testclass=" + t.classname,
+      "--timelimit=" + t.timelimit,
+      "--junit-output-dir=" + t.dir)
+    val log = cmd.!!
+
+    // Create zip files for tests
+    val result = fileUtil.createZipFile(dir,
+      "*.java", RESULT_FILENAME)
+    val resultField = for (r <- result) yield r.toString
+
+    t.copy(log=log, result=resultField)
+  }
+
+
+  /** Copy test results to the result directory */
+  def copyResults(t: TestState): TestState = {
+    val resultsRoot = Paths.get(constants.resultsDir)
+    val resultsDir = resultsRoot.resolve(t.ID.toString)
+    fileUtil.ensureExists(resultsDir)
 
     val result = for (tmpResult <- t.result) 
-      yield copyOneFile(tmpResult, resultsDir)
+      yield fileUtil.copyOneFile(tmpResult, resultsDir)
     t.copy(result=result)
   }
 

@@ -17,12 +17,14 @@ class JsonEndpoints extends ScalatraServlet with JacksonJsonSupport {
 
   val logger = LoggerFactory.getLogger(getClass)
 
+  val worker = new Worker(new FileUtil(), JsonConstants)
+
   before() {
     contentType = formats("json")
   }
 
   get("/test") {
-    Worker.run
+    worker.run
 
     Store.getTests
   }
@@ -35,7 +37,7 @@ class JsonEndpoints extends ScalatraServlet with JacksonJsonSupport {
   post("/test/:id") {
     logger.info("Saving a test for id {}: {}", params("id"))
     Store.addTest(parsedBody.extract[NewTest])
-    Worker.run
+    worker.run
   }
 
   delete("/test/:id") {

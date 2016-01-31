@@ -1,0 +1,13 @@
+package com.google.testing
+
+import org.scalatest.FunSuite
+import org.mockito.Mockito._
+
+object FakeConstants extends Constants {
+  val randoopJar = "randoopJar"
+  val resultsDir = "resultsDir"
+}
+
+class WorkerTest extends FunSuite {
+  val mockFileUtil = mock[FileUtil]
+}
