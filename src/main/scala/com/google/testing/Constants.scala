@@ -13,8 +13,6 @@ trait Constants {
 object JsonConstants extends Constants {
   implicit lazy val formats = DefaultFormats
 
-  lazy val configFile: String = "/Users/zhihan/tools/randoop-server.json"
-
   lazy val config = parse(new File(configFile))
 
   override lazy val randoopJar: String = {
@@ -25,5 +23,14 @@ object JsonConstants extends Constants {
 
   lazy val resultsDir: String =
     (config \ "results_dir").extract[String]
+
+  def configFile: String = {
+    val configFile = "/etc/testgen-server/randoop-server.json"
+    val devFile = "/Users/zhihan/tools/randoop-server.json"
+    if (new File(configFile).exists())
+      configFile
+    else
+      devFile
+  }
 
 }
