@@ -38,4 +38,11 @@ class StoreTest extends FunSuite with BeforeAndAfter {
     val r = Store.getResult(10)
     assert(r == Some("result"))
   }
+
+  test("Next id") {
+    assert(Store.nextID == 11)
+
+    Store.clear
+    assert(Store.nextID == 0)
+  }
 }

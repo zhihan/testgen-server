@@ -7,12 +7,9 @@ testApp.controller(
         var TestResource = $resource('/json/test/:ID', {ID: "@ID"}); 
 
         $scope.tests = [];
-        $scope.nextID = 0;
-
+        
         $scope.newID = function() {
-            var id = $scope.nextID;
-            $scope.nextID += 1;
-            return id;
+            return -1;
         };
 
         $scope.addTest = function() {
@@ -25,7 +22,6 @@ testApp.controller(
                     "classname": classname,
                     "timelimit": timelimit,
                     "state": "READY"};
-                $scope.tests.push(newTest);
                 $scope.classname = "";
                 $scope.timelimit = "";
 
@@ -50,17 +46,7 @@ testApp.controller(
         $scope.loadData = function() {
             TestResource.query(function(tests) {
                 $scope.tests = tests;
-
-                function getMaxOfArray(numArray) {
-                    return Math.max.apply(null, numArray);
-                }
-
-                if (tests.length >= 1) {
-                    $scope.nextID = getMaxOfArray(tests.map(
-                        function(test) { return test.ID;})) + 1;
-                } else {
-                    $scope.nextID = 1;
-                }});
+            });
         };
 
         $scope.loadData();

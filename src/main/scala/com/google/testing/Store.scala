@@ -46,10 +46,21 @@ object Store {
 
   def getTests: List[Test] = testStates.values.toList.map{ _.toTest }
 
+  def nextID: Int = if (testStates.isEmpty) 0 
+    else testStates.values.maxBy{ _.ID }.ID + 1
+
   def addTest(t: NewTest) {
     logger.info("Try to add {}", t)
-    testStates += (t.ID -> TestState.fromNewTest(t))
-    logger.info("{} added to store", t)
+    val testState = TestState.fromNewTest(t)
+    if (testState.ID < 0) {
+      val newTest = testState.copy(ID=Store.nextID)
+      testStates += (newTest.ID -> newTest)
+      logger.info("{} added to store", newTest)       
+    } else {
+      testStates += (t.ID -> testState)
+      logger.info("{} added to store", testState)
+    }
+    
   }
 
   def updateTest(ts: TestState) {
